@@ -3,6 +3,8 @@ import { StyleSheet, View, Text, Image, TextInput } from 'react-native';
 import Button from 'react-native-button';
 import renderIf from 'render-if';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Firebase from 'firebase';
+import { Actions } from 'react-native-router-flux';
 
 import { Colors } from '../../styles';
 
@@ -35,11 +37,40 @@ export default class Login extends Component {
     // ES6 bindings
     // See: https://facebook.github.io/react/docs/reusable-components.html#es6-classes
     // See: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md#es6-classes
+    this.signUp = this.signUp.bind(this);
+    this.signIn = this.signIn.bind(this);
+  }
+
+  componentDidMount() {
+    const user = Firebase.auth().currentUser;
+    console.log(user);
+    if (user != null) {
+      Actions.main();
+    }
+  }
+
+
+  signUp() {
+    if (this.state.password === this.state.confirmPassword) {
+      const auth = Firebase.auth();
+      auth.createUserWithEmailAndPassword(this.state.email, this.state.password).then(user => {
+        user.updateProfile({
+          displayName: this.state.name,
+        }).then(Actions.main()); }, error => {
+        this.setState({ error });
+      });
+    }
+  }
+
+  signIn() {
+    Firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(Actions.main(), error => {
+      this.setState({ error });
+    });
   }
 
   render() {
     const { name, email, password, confirmPassword, creating, connecting, error } = this.state;
-
+    // console.log(name, email, password);
     return (
       <View style={styles.container}>
         <Image
@@ -101,7 +132,7 @@ export default class Login extends Component {
             onChangeText={text => this.setState({ password: text })}
             value={password}
             editable={!connecting}
-            onSubmitEditing={() => creating ? this.refs.passwordConfirmInput.focus() : this.authenticate}
+            onSubmitEditing={() => creating ? this.refs.passwordConfirmInput.focus() : this.signIn()}
           />
         </View>
         {renderIf(creating)(() =>
@@ -119,7 +150,7 @@ export default class Login extends Component {
               onChangeText={text => this.setState({ confirmPassword: text })}
               value={confirmPassword}
               editable={!connecting}
-              onSubmitEditing={this.create}
+              onSubmitEditing={() => this.signUp()}
             />
           </View>
         )}
@@ -129,7 +160,7 @@ export default class Login extends Component {
           containerStyle={styles.button}
           styleDisabled={{ color: Colors.GRAY }}
           disabled={connecting}
-          onPress={creating ? this.crate : this.authenticate}
+          onPress={creating ? this.signUp : this.signIn}
         >
           {connecting ? 'Connecting...' : (creating ? 'Join' : 'Log in')}
         </Button>
@@ -147,16 +178,7 @@ export default class Login extends Component {
   }
 }
 
-/*
-  See: https://facebook.github.io/react/docs/reusable-components.html#prop-validation
- */
-// TemplateComponent.propTypes = {
-//   message: React.PropTypes.string,
-// };
 
-/*
-  See: https://facebook.github.io/react-native/docs/flexbox.html
- */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -190,11 +212,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.GRAY,
     backgroundColor: 'white',
   },
-  input: {
-    flex: 1,
-    fontSize: 18,
-    marginLeft: 2,
-  },
   title: {
     fontSize: 50,
     color: Colors.MAIN,
@@ -210,11 +227,10 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   icon: {
-    fontSize: 18,
+    fontSize: 30,
     color: Colors.GRAY,
     marginHorizontal: 10,
     textAlign: 'center',
-    width: 18,
     backgroundColor: 'transparent',
   },
   buttonText: {

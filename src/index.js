@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, BackAndroid } from 'react-native';
 import { Scene, Router, Actions } from 'react-native-router-flux';
+import Firebase from 'firebase';
 
 import Metrics from './metrics';
 import Toolbar from './components/toolbar/';
@@ -9,6 +10,7 @@ import Platform from './utils/platform';
 
 // import Intro from './components/intro';
 import Login from './components/login';
+import Main from './components/main';
 
 // Development help
 // import Template from './utils/template';
@@ -21,6 +23,13 @@ export default class Routing extends Component {
       loading: false,
       connected: false,
     };
+    const config = {
+      apiKey: 'AIzaSyDEIZswePLhDXFyeXhFwu-toDhcBFr_OeU',
+      authDomain: 'aions-42aa0.firebaseapp.com',
+      databaseURL: 'https://aions-42aa0.firebaseio.com',
+      storageBucket: 'aions-42aa0.appspot.com',
+    };
+    Firebase.initializeApp(config);
   }
 
   componentDidMount() {
@@ -72,6 +81,7 @@ export default class Routing extends Component {
       <Router>
         <Scene key="root">
           <Scene key="login" hideNavBar component={Login} />
+          <Scene key="main" tabs tabBarStyle={styles.tabbar} title={'AIONS'} component={Main} />
           {/* <Scene
             key="main"
             tabs
