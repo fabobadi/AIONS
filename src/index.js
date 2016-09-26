@@ -9,8 +9,12 @@ import TabIcon from './components/tab-icon';
 import Platform from './utils/platform';
 
 // import Intro from './components/intro';
+import Intro from './components/intro';
 import Login from './components/login';
-import Main from './components/main';
+import Dashboard from './components/dashboard';
+import Historial from './components/historial';
+import Info from './components/info';
+import Profile from './components/profile';
 
 // Development help
 // import Template from './utils/template';
@@ -80,20 +84,27 @@ export default class Routing extends Component {
     return (
       <Router>
         <Scene key="root">
+          <Scene key="intro" hideNavBar component={Intro} />
           <Scene key="login" hideNavBar component={Login} />
-          <Scene key="main" tabs tabBarStyle={styles.tabbar} title={'AIONS'} component={Main} />
-          {/* <Scene
-            key="main"
-            tabs
-            hideNavBar
-            default="Grappe"
-            direction="vertical"
-            tabBarStyle={styles.tabbar}
-            // {...noBack}
-          /> */}
+          <Scene key="main" type="replace" tabs default="AIONS" hideNavBar tabBarStyle={styles.tabbar} {...noBack} >
+            <Scene
+              key="dashboard" title="Dashboard" tabBarStyle={styles.tabbar}
+              image="line-chart" component={Dashboard} {...tab}
+            />
+            <Scene
+              key="history" title="Historial" tabBarStyle={styles.tabbar}
+              image="tasks" component={Historial} {...tab}
+            />
+            <Scene
+              key="info" title="Info" tabBarStyle={styles.tabbar}
+              image="info" component={Info} {...tab}
+            />
+            <Scene
+              key="profile" title="Profile" tabBarStyle={styles.tabbar}
+              image="user" component={Profile} {...tab}
+            />
+          </Scene>
         </Scene>
-        {/* Set this to 'initial' to see it */}
-        {/* <Scene key="template" component={Template} title="Template" navigationBarStyle={styles.transparent} /> */}
       </Router>
     );
   }

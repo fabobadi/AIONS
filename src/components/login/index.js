@@ -41,29 +41,22 @@ export default class Login extends Component {
     this.signIn = this.signIn.bind(this);
   }
 
-  componentDidMount() {
-    const user = Firebase.auth().currentUser;
-    console.log(user);
-    if (user != null) {
-      Actions.main();
-    }
-  }
-
-
   signUp() {
     if (this.state.password === this.state.confirmPassword) {
       const auth = Firebase.auth();
       auth.createUserWithEmailAndPassword(this.state.email, this.state.password).then(user => {
         user.updateProfile({
           displayName: this.state.name,
-        }).then(Actions.main()); }, error => {
+        }).then(Actions.main(user)); }, error => {
         this.setState({ error });
       });
     }
   }
 
   signIn() {
-    Firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(Actions.main(), error => {
+    Firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(user => {
+      Actions.main(user);
+    }, error => {
       this.setState({ error });
     });
   }

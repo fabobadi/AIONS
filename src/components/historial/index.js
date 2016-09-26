@@ -3,14 +3,13 @@ import { StyleSheet, View, Text } from 'react-native';
 import Button from 'react-native-button';
 import renderIf from 'render-if';
 import Firebase from 'firebase';
-import Loading from '../loading';
 
 /*
   Component life-cycle:
   https://facebook.github.io/react/docs/component-specs.html
  */
 
-export default class main extends Component {
+export default class Historial extends Component {
 
   static get defaultProps() {
     return {
@@ -21,45 +20,38 @@ export default class main extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
-      currentUser: [],
-      data: [],
+      array: ['zero', 'one', 'two'],
+      something: true,
     };
-    this.fetchUser = this.fetchUser.bind(this);
-    this.fetchData = this.fetchData.bind(this);
+
+    // ES6 bindings
+    // See: https://facebook.github.io/react/docs/reusable-components.html#es6-classes
+    // See: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md#es6-classes
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  componentWillMount() {
-    this.setState({ loading: true });
-    this.fetchUser();
-    this.fetchData();
-  }
-
-  fetchUser() {
-    const currentUser = Firebase.auth().currentUser;
-    console.log(currentUser);
-    this.setState({ currentUser });
-  }
-
-  fetchData() {
-    Firebase.database().ref('Data').on('value', (snapshot) => {
-      const data = snapshot.val();
-      console.log(data);
-      this.setState({ data, loading: false });
-    });
+  handleClick() {
+    this.setState({ something: !this.state.something });
   }
 
   render() {
-    const { currentUser, data, loading } = this.state;
-    if (loading) {
-      return (<View style={styles.loading}><Loading /></View>);
-    }
     return (
       <View style={styles.container}>
-        <Text>Bienvenido {currentUser.displayName}</Text>
-        <Text>Temperatura {data.Test1.temperatura}</Text>
-        <Text>Humedad {data.Test1.humedad}</Text>
-        <Text>Luminosidad {data.Test1.luminosidad}</Text>
+
+        <Text>{this.props.message}</Text>
+
+        {/* Map array to text components */}
+        {this.state.array.map((item, i) => (
+          <Text key={i}>{item}</Text>
+        ))}
+
+        <Button onPress={this.handleClick}>Press me</Button>
+
+        {/* Conditional rendenring (https://github.com/ajwhite/render-if) */}
+        {renderIf(this.state.something)(() => (
+          <Text>This is rendered if 'something' is true</Text>
+        ))}
+
       </View>
     );
   }
@@ -91,10 +83,5 @@ const styles = StyleSheet.create({
     // top: 0,
     // left: 0,
     // bottom: 0,
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
